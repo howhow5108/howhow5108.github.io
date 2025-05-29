@@ -1,0 +1,126 @@
+<head>
+    <title>Document</title>
+    <style>
+        .send-box {
+            display: flex;
+            align-items: cemter;
+            justify-context: center;
+            gap: 16px;
+            height: 20%;
+        }
+
+        .send-box textarea {
+            width: 80%;
+            resize: none;
+        }
+
+        .send-box .send-btn {
+            flex-shrink: 0;
+            width: 10%;
+            min-width: 32px;
+            height: 66px;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas"
+  width="400" 
+  height="400" 
+  style="border: 1px solid #ccc;"
+></canvas>
+<div class="send-box">
+    <button class="send-btn" id="saveBtn">Save</button>
+    <button class="send-btn" id="loadBtn">Load</button>
+    <button class="send-btn" id="ClearBtn">Clear</button>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/fabric@latest/dist/index.min.js"></script>
+<script type="text/javascript">  
+    var ws
+    var canvas
+    const saveBtn = document.querySelector('#saveBtn');    
+    const loadBtn = document.querySelector('#loadBtn');
+    const clearBtn = document.querySelector('#clearBtn');      
+    saveBtn.addEventListener("click", save);
+    loadBtn.addEventListener("click", load);
+    clearBtn.addEventListener("click", clear);
+    function save() {
+        console.log('save')
+        sendMsg(ws,{tag: 'save', data: JSON.stringify(canvas)})
+        canvas.isDrawingMode = false
+    }
+    function load() {
+        console.log('load')
+        sendMsg(ws,{tag: 'load', data: JSON.stringify(canvas)})
+    }
+    function clear() {
+        console.log('clear')
+        canvas.clear();
+        sendMsg(ws,{tag: 'clear', data: JSON.stringify(canvas)})
+    }
+    function mouseUp() {
+        if (!canvas.isDrawingMode) {
+            return;
+        };
+        canvas.isDrawingMode = false;
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas)})
+    }
+    function connectWebSocket() {
+            ws = new WebSocket('ws://localhost:8080');
+
+            ws.onopen = function (event) {
+                console.log('WebSocket connected');
+                sendMsg(ws,{tag: 'connected'});
+                sendMsg(ws,{tag: 'request'});
+            };
+
+            ws.onerror = function (event) {
+                console.log(event)
+                ws.onclose=function(e){
+                    console.log(e)
+                };
+            };
+
+            ws.onmessage = function (event) {  
+                const msg = JSON.parse(event.data);  
+                console.log(msg);
+                if (msg.tag == 'start') {
+                    canvas = new fabric.Canvas('canvas');
+                    if (msg.data) {
+                        canvas.loadFromJSON(msg.data);
+                        canvas.requestRenderAll();
+                    };
+                    canvas.skipTargetFind = true;
+                    canvas.selection = false;
+                    canvas.isDrawingMode = true;
+                    canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+                    canvas.freeDrawingBrush.width = 5;
+                    canvas.on('mouse:up', e => {
+                        if (!canvas.isDrawingMode) {                           return;
+                        };
+                        console.log(e)
+                        canvas.isDrawingMode = false;
+                        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas)})
+                    })
+                } else if (msg.tag == 'canvas') {
+                    canvas.loadFromJSON(msg.data);
+                    canvas.requestRenderAll();
+                }
+            };
+
+            ws.onclose = function (event) {
+                console.log('WebSocket closed',event);
+                // reconnect
+                setTimeout(connectWebSocket, 1000/2);
+            };
+
+        }
+
+    function sendMsg(ws, msg) {
+        if (!ws) {
+            return;
+        }
+        ws.send(JSON.stringify(msg));
+    }
+    connectWebSocket();
+</script>
+</body>
