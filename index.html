@@ -41,7 +41,7 @@
   style="border: 1px solid #ccc;"
 ></canvas>
 <div class="send-box">
-    <button class="send-btn" id="saveBtn">SenDDDDD</button>
+    <button class="send-btn" id="saveBtn">SEnD</button>
     <button class="send-btn" id="loadBtn">Test</button>
     <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>
 </div>
@@ -137,7 +137,9 @@
                 const msg = JSON.parse(event.data);  
                 console.log(msg);
                 if (msg.tag == 'start') {
-                    canvas = new fabric.Canvas('canvas',{backgroundColor: "green"});
+                    canvas = new fabric.Canvas('canvas');
+                    canvas.backgroundColor = 'white'
+                    canvas.requestRenderAll();
                     if (msg.data) {
                         canvas.loadFromJSON(msg.data);
                         canvas.requestRenderAll();
