@@ -84,6 +84,7 @@
 
     function clear() {
         console.log('clear')
+        console.log(window.location.search)
         canvas.clear();
         sendMsg(ws,{tag: 'clear', data: JSON.stringify(canvas)})
     }
@@ -101,8 +102,17 @@
 
             ws.onopen = function (event) {
                 console.log('WebSocket connected');
-                sendMsg(ws,{tag: 'connected'});
-                sendMsg(ws,{tag: 'request'});
+                query = window.location.search
+                urlParams = new URLSearchParams(query);
+                user_id = urlParams.get('user_id');
+                chat_id = urlParams.get('chat_id');
+                console.log(user_id, chat_id)
+                sendMsg(ws,{
+                    tag: 'connected', data: {user_id: user_id, chat_id: chat_id}
+                });
+                sendMsg(ws,{
+                    tag: 'request', data: {user_id: user_id, chat_id: chat_id}
+                });
             };
 
             ws.onerror = function (event) {
