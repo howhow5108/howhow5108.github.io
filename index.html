@@ -41,7 +41,7 @@
   style="border: 1px solid #ccc;"
 ></canvas>
 <div class="send-box">
-    <button class="send-btn" id="saveBtn">Send</button>
+    <button class="send-btn" id="saveBtn">Sendd</button>
     <button class="send-btn" id="loadBtn">Test</button>
     <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>
 </div>
@@ -102,6 +102,7 @@
 
             ws.onopen = function (event) {
                 console.log('WebSocket connected');
+                /*
                 query = window.location.search
                 console.log('asdasdasdasd', window.location)
                 urlParams = new URLSearchParams(query);
@@ -111,11 +112,14 @@
                 console.log(user_id, chat_id)
                 console.log('456', window.Telegram)
                 console.log('123123123', window.Telegram.WebApp)
+                */
+                user = window.Telegram.WebApp.initDataUnsafe.user
+                chat_id = window.Telegram.WebApp.initDataUnsafe.chat_instance
                 sendMsg(ws,{
-                    tag: 'connected', data: {user_id: user_id, chat_id: chat_id}
+                    tag: 'connected', data: {user: user, chat_id: chat_id}
                 });
                 sendMsg(ws,{
-                    tag: 'request', data: {user_id: user_id, chat_id: chat_id}
+                    tag: 'request', data: {user: user, chat_id: chat_id}
                 });
             };
 
