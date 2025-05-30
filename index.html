@@ -21,6 +21,10 @@
             height: 66px;
         }
     </style>
+    <!-- Load the Telegram Library -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Load the Fabric Library -->
+    <script src="https://cdn.jsdelivr.net/npm/fabric@latest/dist/index.min.js"></script
 </head>
 <body>
 <canvas id="canvas"
@@ -29,11 +33,10 @@
   style="border: 1px solid #ccc;"
 ></canvas>
 <div class="send-box">
-    <button class="send-btn" id="saveBtn">Save</button>
+    <button class="send-btn" id="saveBtn">Send</button>
     <button class="send-btn" id="loadBtn">Load</button>
     <button class="send-btn" id="ClearBtn">Clear</button>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/fabric@latest/dist/index.min.js"></script>
 <script type="text/javascript">  
     var ws
     var canvas
@@ -43,20 +46,35 @@
     saveBtn.addEventListener("click", save);
     loadBtn.addEventListener("click", load);
     clearBtn.addEventListener("click", clear);
+
     function save() {
+        /*
         console.log('save')
         sendMsg(ws,{tag: 'save', data: JSON.stringify(canvas)})
         canvas.isDrawingMode = false
+        */
+        temp = canvas.toDataURL({format: 'jpeg'})
+        console.log(temp)        
+        window.Telegram.WebApp.sendData(JSON.stringify(
+            {
+                tag: 'send_pic',
+                data: temp
+            }
+            ));
+        
     }
+
     function load() {
         console.log('load')
         sendMsg(ws,{tag: 'load', data: JSON.stringify(canvas)})
     }
+
     function clear() {
         console.log('clear')
         canvas.clear();
         sendMsg(ws,{tag: 'clear', data: JSON.stringify(canvas)})
     }
+
     function mouseUp() {
         if (!canvas.isDrawingMode) {
             return;
@@ -64,6 +82,7 @@
         canvas.isDrawingMode = false;
         sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas)})
     }
+
     function connectWebSocket() {
             ws = new WebSocket('wss://howhow5108.camdvr.org:8080');
 
