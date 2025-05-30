@@ -106,6 +106,7 @@
                 urlParams = new URLSearchParams(query);
                 user_id = urlParams.get('user_id');
                 chat_id = urlParams.get('chat_id');
+                console.log(urlParams)
                 console.log(user_id, chat_id)
                 sendMsg(ws,{
                     tag: 'connected', data: {user_id: user_id, chat_id: chat_id}
