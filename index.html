@@ -103,6 +103,7 @@
             ws.onopen = function (event) {
                 console.log('WebSocket connected');
                 query = window.location.search
+                console.log('asdasdasdasd', window.location)
                 urlParams = new URLSearchParams(query);
                 user_id = urlParams.get('user_id');
                 chat_id = urlParams.get('chat_id');
