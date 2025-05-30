@@ -43,7 +43,7 @@
 <div class="send-box">
     <button class="send-btn" id="saveBtn">Send</button>
     <button class="send-btn" id="loadBtn">Test</button>
-    <button class="send-btn" id="ClearBtn">Clear</button>
+    <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>
 </div>
 <script type="text/javascript">  
     var ws
@@ -108,6 +108,7 @@
                 chat_id = urlParams.get('chat_id');
                 console.log(urlParams)
                 console.log(user_id, chat_id)
+                console.log('456', window.Telegram)
                 console.log('123123123', window.Telegram.WebApp)
                 sendMsg(ws,{
                     tag: 'connected', data: {user_id: user_id, chat_id: chat_id}
