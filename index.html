@@ -41,7 +41,7 @@
   style="border: 1px solid #ccc;"
 ></canvas>
 <div class="send-box">
-    <button class="send-btn" id="saveBtn">Sendd</button>
+    <button class="send-btn" id="saveBtn">Sendddddd</button>
     <button class="send-btn" id="loadBtn">Test</button>
     <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>
 </div>
@@ -79,7 +79,7 @@
         */
         temp = canvas.toDataURL({format: 'jpeg'})
         console.log(window.location.search)
-        sendMsg(ws,{tag: 'send_img', data: {target: ws, img: temp}})
+        sendMsg(ws,{tag: 'send_img', data: {chat_id: chat_id, img: temp}})
     }
 
     function clear() {
