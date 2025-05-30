@@ -43,7 +43,7 @@
 <div class="send-box">
     <button class="send-btn" id="saveBtn">Send</button>
     <button class="send-btn" id="loadBtn">Test</button>
-    <button class="send-btn" id="ClearBtn">Clear</button>
+    <button class="send-btn" id="ClearBtn">Clearrr</button>
 </div>
 <script type="text/javascript">  
     var ws
@@ -78,6 +78,7 @@
         sendMsg(ws,{tag: 'load', data: JSON.stringify(canvas)})
         */
         temp = canvas.toDataURL({format: 'jpeg'})
+        console.log(window.location.search)
         sendMsg(ws,{tag: 'send_img', data: {target: ws, img: temp}})
     }
 
