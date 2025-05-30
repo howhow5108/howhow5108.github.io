@@ -108,6 +108,7 @@
                 chat_id = urlParams.get('chat_id');
                 console.log(urlParams)
                 console.log(user_id, chat_id)
+                console.log('123123123', windon.Telegram)
                 sendMsg(ws,{
                     tag: 'connected', data: {user_id: user_id, chat_id: chat_id}
                 });
