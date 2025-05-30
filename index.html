@@ -41,7 +41,7 @@
   style="border: 1px solid #ccc;"
 ></canvas>
 <div class="send-box">
-    <button class="send-btn" id="saveBtn">SenD</button>
+    <button class="send-btn" id="saveBtn">SenDDDDD</button>
     <button class="send-btn" id="loadBtn">Test</button>
     <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>
 </div>
@@ -61,7 +61,7 @@
         sendMsg(ws,{tag: 'save', data: JSON.stringify(canvas)})
         canvas.isDrawingMode = false
         */
-        temp = canvas.toDataURL({format: 'jpeg'})
+        temp = canvas.toDataURL({format: 'png'})
         console.log(temp)        
         window.Telegram.WebApp.sendData(JSON.stringify(
             {
@@ -137,7 +137,7 @@
                 const msg = JSON.parse(event.data);  
                 console.log(msg);
                 if (msg.tag == 'start') {
-                    canvas = new fabric.Canvas('canvas');
+                    canvas = new fabric.Canvas('canvas',{backgroundColor: "green"});
                     if (msg.data) {
                         canvas.loadFromJSON(msg.data);
                         canvas.requestRenderAll();
