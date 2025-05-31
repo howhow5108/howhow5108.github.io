@@ -45,7 +45,7 @@
 ></canvas>
 
 <div class="send-box">
-    <button class="send-btn" id="saveBtn">SEnD</button>
+    <button class="send-btn" id="saveBtn">SEEEEEnD</button>
     <button class="send-btn" id="loadBtn">Teeeszxt</button>
     <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>    
 </div>
@@ -193,7 +193,8 @@
                         };
                         console.log(e)
                         canvas.isDrawingMode = false;
-                        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas)})
+                        console('checking', chat_id)
+                        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id})
                     })
                 } else if (msg.tag == 'canvas') {
                     canvas.loadFromJSON(msg.data);
