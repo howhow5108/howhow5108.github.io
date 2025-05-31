@@ -70,7 +70,6 @@
     canvas.selection = false;  
     canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
     canvas.freeDrawingBrush.width = 5;
-    canvas.freeDrawingBrush.color = color[msg.user_data.color]
     canvas.on('mouse:up', e => {
         if (!canvas.isDrawingMode) {
             return;
