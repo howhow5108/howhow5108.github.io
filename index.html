@@ -43,17 +43,20 @@
   height="400" 
   style="border: 1px solid #ccc;"
 ></canvas>
+
 <div class="send-box">
     <button class="send-btn" id="saveBtn">SEnD</button>
     <button class="send-btn" id="loadBtn">Tezt</button>
-    <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>
+    <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>    
 </div>
+<label id="currentPlayer"></label>
 <script type="text/javascript">  
     var ws
     var canvas
     const saveBtn = document.querySelector('#saveBtn');    
     const loadBtn = document.querySelector('#loadBtn');
-    const clearBtn = document.querySelector('#clearBtn');      
+    const clearBtn = document.querySelector('#clearBtn');  
+    const cPlayerLabel = document.querySelector('#currentPlayer');
     saveBtn.addEventListener("click", save);
     loadBtn.addEventListener("click", load);
     clearBtn.addEventListener("click", clear);
@@ -170,6 +173,9 @@
                 } else if (msg.tag == 'canvas') {
                     canvas.loadFromJSON(msg.data);
                     canvas.requestRenderAll();
+                } else if (msg.tag == 'current_player') {
+                    player = msg.data
+                    cPlayerLabel.innerHTML = player.name
                 }
             };
 
