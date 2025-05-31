@@ -174,8 +174,7 @@
                     canvas.loadFromJSON(msg.data);
                     canvas.requestRenderAll();
                 } else if (msg.tag == 'current_player') {
-                    player = msg.data
-                    cPlayerLabel.innerHTML = player.name
+                    cPlayerLabel.innerHTML = msg.data.name
                 }
             };
 
