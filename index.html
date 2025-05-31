@@ -45,7 +45,7 @@
 ></canvas>
 <div class="send-box">
     <button class="send-btn" id="saveBtn">SEnD</button>
-    <button class="send-btn" id="loadBtn">TeXst</button>
+    <button class="send-btn" id="loadBtn">Test</button>
     <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>
 </div>
 <script type="text/javascript">  
@@ -122,6 +122,8 @@
                 user = window.Telegram.WebApp.initDataUnsafe.user
                 var params = window.location.search.replace('?tgWebAppStartParam=', '')
                 //params = "b'" + params + "'"
+                console.log(params)
+                params = decodeURI(params)
                 console.log(params)
                 params = window.atob(params)
                 console.log(params)
