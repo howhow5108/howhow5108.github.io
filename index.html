@@ -53,7 +53,33 @@
 <label id="currentPlayer"></label>
 <script type="text/javascript">  
     var ws
-    var canvas = document.querySelector('#canvas')    
+    var canvas = document.querySelector('#canvas')  
+    var canvas = new fabric.Canvas('canvas');
+    let screenW = document.documentElement.clientWidth
+    let screenH = document.documentElement.clientHeight
+    let gameWH = 364
+    let kW = screenW / gameWH
+    let kH = screenH / gameWH
+    canvas.width = gameWH * kW
+    canvas.height = gameWH * kW
+    canvas.setZoom(kW)
+    cPlayerLabel.innerHTML = 'width=' + canvas.width
+    canvas.backgroundColor = 'white'                    
+    canvas.requestRenderAll();
+    canvas.skipTargetFind = true;
+    canvas.selection = false;  
+    canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+    canvas.freeDrawingBrush.width = 5;
+    canvas.freeDrawingBrush.color = color[msg.user_data.color]
+    canvas.on('mouse:up', e => {
+        if (!canvas.isDrawingMode) {
+            return;
+        };
+        console.log(e)
+        canvas.isDrawingMode = false;
+        console.log('checking', chat_id)
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id})
+    })
     /*
     const saveBtn = document.querySelector('#saveBtn');    
     const loadBtn = document.querySelector('#loadBtn');
@@ -154,38 +180,12 @@
             ws.onmessage = function (event) {  
                 const msg = JSON.parse(event.data);  
                 console.log(msg);
-                if (msg.tag == 'start') {
-                    canvas = new fabric.Canvas('canvas');
-                    let screenW = document.documentElement.clientWidth
-                    let screenH = document.documentElement.clientHeight
-                    let gameWH = 364
-                    let kW = screenW / gameWH
-                    let kH = screenH / gameWH
-                    canvas.setZoom(kW)
-                    cPlayerLabel.innerHTML = 'width = ' + canvas.width
-                    canvas.backgroundColor = 'white'                    
-                    canvas.requestRenderAll();
+                if (msg.tag == 'start') {                    
                     if (msg.data) {
                         canvas.loadFromJSON(msg.data);
                         canvas.requestRenderAll();
-                    };
-                    canvas.skipTargetFind = true;
-                    canvas.selection = false;
-                    var params = window.location.search.replace('?tgWebAppStartParam')   
-                    /*                 
-                    canvas.isDrawingMode = true;
-                    */
-                    canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
-                    canvas.freeDrawingBrush.width = 5;
-                    canvas.freeDrawingBrush.color = color[msg.user_data.color]
-                    canvas.on('mouse:up', e => {
-                        if (!canvas.isDrawingMode) {                           return;
-                        };
-                        console.log(e)
-                        canvas.isDrawingMode = false;
-                        console.log('checking', chat_id)
-                        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id})
-                    })
+                    };                    
+                    canvas.freeDrawingBrush.color = color[msg.user_data.color];                    
                 } else if (msg.tag == 'canvas') {
                     canvas.loadFromJSON(msg.data);
                     canvas.requestRenderAll();
