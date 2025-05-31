@@ -58,11 +58,10 @@
     let screenW = document.documentElement.clientWidth
     let screenH = document.documentElement.clientHeight
     let gameWH = 364
-    let kW = screenW / gameWH
-    let kH = screenH / gameWH
-    canvas.setDimensions({width:gameWH * kW, height:gameWH * kW});
+    let kW = screenW - 10 / gameWH
+    canvas.setDimensions({width:screenW-10, height:screenW-10});
     canvas.setZoom(kW)
-    cPlayerLabel.innerHTML = 'width=' + canvas.width
+    cPlayerLabel.innerHTML = 'width = ' + canvas.width
     canvas.backgroundColor = 'white'                    
     canvas.requestRenderAll();
     canvas.skipTargetFind = true;
@@ -115,8 +114,7 @@
                 tag: 'send_pic',
                 data: temp
             }
-            ));
-        
+            ));        
     }
 
     function load() {
@@ -141,7 +139,8 @@
             return;
         };
         canvas.isDrawingMode = false;
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas)})
+        temp = canvas.toDataURL({format: 'jpeg'})
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), img: temp})
     }
 
     function connectWebSocket() {
