@@ -39,9 +39,9 @@
 <body>
 
 <canvas id="canvas"
-  width="600" 
+  width="400" 
   height="400" 
-  style="border: 1px solid #ccc;"
+  style="border: 10px solid #ccc;"
 ></canvas>
 <!--
 <div class="send-box">
@@ -53,7 +53,9 @@
 <label id="currentPlayer"></label>
 <script type="text/javascript">  
     var ws
-    var canvas
+    var canvas = document.querySelector('#canvas')
+    canvas.width = document.documentElement.clientWidth;
+    canvas.height = document.documentElement.clientHeight;
     /*
     const saveBtn = document.querySelector('#saveBtn');    
     const loadBtn = document.querySelector('#loadBtn');
@@ -156,9 +158,7 @@
                 console.log(msg);
                 if (msg.tag == 'start') {
                     canvas = new fabric.Canvas('canvas');
-                    canvas.backgroundColor = 'white'
-                    canvas.width = document.documentElement.clientWidth;
-                    canvas.height = document.documentElement.clientHeight;
+                    canvas.backgroundColor = 'white'                    
                     canvas.requestRenderAll();
                     if (msg.data) {
                         canvas.loadFromJSON(msg.data);
