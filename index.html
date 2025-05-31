@@ -186,7 +186,7 @@
                     canvas.loadFromJSON(msg.data);
                     canvas.requestRenderAll();
                 } else if (msg.tag == 'current_player') {
-                    cPlayerLabel.innerHTML = msg.data.name
+                    /*cPlayerLabel.innerHTML = msg.data.name*/
                     console.log(user, user.id)
                     if (msg.data.id == user.id) {
                         canvas.isDrawingMode = true;                        
