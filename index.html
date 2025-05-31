@@ -60,9 +60,8 @@
     let gameWH = 364
     let kW = screenW / gameWH
     let kH = screenH / gameWH
-    canvas.width = gameWH * kW
-    canvas.height = gameWH * kW
-    /*canvas.setZoom(kW)*/
+    canvas.setDimensions({width:gameWH * kW, height:gameWH * kW});
+    canvas.setZoom(kW)
     cPlayerLabel.innerHTML = 'width=' + canvas.width
     canvas.backgroundColor = 'white'                    
     canvas.requestRenderAll();
