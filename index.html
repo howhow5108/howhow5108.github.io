@@ -76,7 +76,8 @@
         console.log(e)
         canvas.isDrawingMode = false;
         console.log('checking', chat_id)
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id})
+        temp = canvas.toDataURL({format: 'jpeg'})
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp})
     })
     /*
     const saveBtn = document.querySelector('#saveBtn');    
@@ -133,15 +134,6 @@
         console.log(window.location.search)
         canvas.clear();
         sendMsg(ws,{tag: 'clear', data: JSON.stringify(canvas)})
-    }
-
-    function mouseUp() {
-        if (!canvas.isDrawingMode) {
-            return;
-        };
-        canvas.isDrawingMode = false;
-        temp = canvas.toDataURL({format: 'jpeg'})
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), img: temp})
     }
 
     function connectWebSocket() {
