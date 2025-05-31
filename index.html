@@ -67,7 +67,6 @@
     let ratio = finalWH / gameWH    
     canvas.setDimensions({width:finalWH, height:finalWH});
     canvas.setZoom(ratio)
-    cPlayerLabel.innerHTML = 'width = ' + canvas.width + '~'
     canvas.backgroundColor = 'white'                    
     canvas.requestRenderAll();
     canvas.skipTargetFind = true;
@@ -156,7 +155,8 @@
                 console.log(params)
                 params = window.atob(params)
                 console.log(params)
-                chat_id = params
+                chat_id = params[0]
+                game_id = params[1]
                 sendMsg(ws,{
                     tag: 'connected', data: {user: user, chat_id: chat_id}
                 });
@@ -185,7 +185,7 @@
                     canvas.loadFromJSON(msg.data);
                     canvas.requestRenderAll();
                 } else if (msg.tag == 'current_player') {
-                    /*cPlayerLabel.innerHTML = msg.data.name*/
+                    cPlayerLabel.innerHTML = msg.data.name
                     console.log(user, user.id)
                     if (msg.data.id == user.id) {
                         canvas.isDrawingMode = true;                        
@@ -205,6 +205,7 @@
         if (!ws) {
             return;
         }
+        msg.game_id = game_id;
         ws.send(JSON.stringify(msg));
     }
     connectWebSocket();
