@@ -46,7 +46,7 @@
 
 <div class="send-box">
     <button class="send-btn" id="saveBtn">SEnD</button>
-    <button class="send-btn" id="loadBtn">Teszxt</button>
+    <button class="send-btn" id="loadBtn">Teeeszxt</button>
     <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>    
 </div>
 <label id="currentPlayer"></label>
@@ -60,7 +60,7 @@
     saveBtn.addEventListener("click", save);
     loadBtn.addEventListener("click", load);
     clearBtn.addEventListener("click", clear);
-    const color = {
+    const color2 = {
         '\U0001F534': 'rgb(232, 18, 36)',   //🔴
         '\U0001F7E0': 'rgb(247,99,12)',     //🟠
         '\U0001F7E1': 'rgb(255,241,0)',     //🟡
@@ -70,6 +70,17 @@
         '\U0001F4A9': 'rgb(142,86,46)',     //💩
         '\U000026AB': 'rgb(56,56,56)',      //⚫
     }
+    const color = {
+        '🔴': 'rgb(232, 18, 36)',   //🔴
+        '🟠': 'rgb(247,99,12)',     //🟠
+        '🟡': 'rgb(255,241,0)',     //🟡
+        '🟢': 'rgb(22,198,12)',     //🟢
+        '🔵': 'rgb(0,120,215)',     //🔵
+        '🟣': 'rgb(136,108,228)',   //🟣
+        '💩': 'rgb(142,86,46)',     //💩
+        '⚫': 'rgb(56,56,56)',      //⚫
+    }
+    console.log(color['⚫'])
 
 
     function save() {
