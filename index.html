@@ -58,7 +58,12 @@
     let screenW = document.documentElement.clientWidth
     let screenH = document.documentElement.clientHeight
     let gameWH = 364
-    let finalWH = Math.min(screenW, screenH) - 20
+    let finalWH = Math.min(screenW, screenH)
+    if (finalWH == screenH) {
+        finalWH -= 100
+    } else {
+        finalWH -= 20
+    };
     let ratio = finalWH / gameWH    
     canvas.setDimensions({width:finalWH, height:finalWH});
     canvas.setZoom(ratio)
