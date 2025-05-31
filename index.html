@@ -39,8 +39,8 @@
 <body>
 
 <canvas id="canvas"
-  width="400" 
-  height="400" 
+  width="364" 
+  height="364" 
   style="border: 1px solid #ccc;"
 ></canvas>
 <!--
@@ -54,15 +54,19 @@
 <script type="text/javascript">  
     var ws
     var canvas = document.querySelector('#canvas')
-    canvas.width = document.documentElement.clientWidth - 20;
-    canvas.height = canvas.width;
+    let screenW = document.documentElement.clientWidth
+    let screenH = document.documentElement.clientHeight
+    let gameWH = 364
+    let kW = screenW / gameW
+    let kH = screenH / gameH
+    canvas.setZoom(kW)
     /*
     const saveBtn = document.querySelector('#saveBtn');    
     const loadBtn = document.querySelector('#loadBtn');
     const clearBtn = document.querySelector('#clearBtn');  
     */
     const cPlayerLabel = document.querySelector('#currentPlayer');
-    cPlayerLabel.innerHTML = canvas.width
+    cPlayerLabel.innerHTML = 'width = ' + canvas.width
     /*
     saveBtn.addEventListener("click", save);
     loadBtn.addEventListener("click", load);
