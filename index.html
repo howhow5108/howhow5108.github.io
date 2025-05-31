@@ -206,6 +206,7 @@
             return;
         }
         msg.game_id = game_id;
+        console.log('msg======',msg)
         ws.send(JSON.stringify(msg));
     }
     connectWebSocket();
