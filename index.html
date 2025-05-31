@@ -46,7 +46,7 @@
 
 <div class="send-box">
     <button class="send-btn" id="saveBtn">SEnD</button>
-    <button class="send-btn" id="loadBtn">Tezt</button>
+    <button class="send-btn" id="loadBtn">Teszxt</button>
     <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>    
 </div>
 <label id="currentPlayer"></label>
@@ -60,6 +60,17 @@
     saveBtn.addEventListener("click", save);
     loadBtn.addEventListener("click", load);
     clearBtn.addEventListener("click", clear);
+    const color = {
+        '\U0001F534': 'rgb(232, 18, 36)',   # 🔴
+        '\U0001F7E0': 'rgb(247,99,12)',     # 🟠
+        '\U0001F7E1': 'rgb(255,241,0)',     # 🟡
+        '\U0001F7E2': 'rgb(22,198,12)',     # 🟢
+        '\U0001F535': 'rgb(0,120,215)',     # 🔵
+        '\U0001F7E3': 'rgb(136,108,228)',   # 🟣
+        '\U0001F4A9': 'rgb(142,86,46)',     # 💩
+        '\U000026AB': 'rgb(56,56,56)',      # ⚫
+    }
+
 
     function save() {
         /*
@@ -159,8 +170,10 @@
                     };
                     canvas.skipTargetFind = true;
                     canvas.selection = false;
-                    var params = window.location.search.replace('?tgWebAppStartParam')                    
+                    var params = window.location.search.replace('?tgWebAppStartParam')   
+                    /*                 
                     canvas.isDrawingMode = true;
+                    */
                     canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
                     canvas.freeDrawingBrush.width = 5;
                     canvas.on('mouse:up', e => {
@@ -175,6 +188,11 @@
                     canvas.requestRenderAll();
                 } else if (msg.tag == 'current_player') {
                     cPlayerLabel.innerHTML = msg.data.name
+                    console.log(user, user.id)
+                    if (msg.data.id == user.id) {
+                        canvas.isDrawingMode = true;
+                        canvas.freeDrawingBrush.color = color[user.color]
+                    }
                 }
             };
 
