@@ -25,6 +25,7 @@
     <script src="https://telegram.org/js/telegram-web-app.js?57"></script>
     <!-- Load the Fabric Library -->
     <script src="https://cdn.jsdelivr.net/npm/fabric@latest/dist/index.min.js"></script>
+    <!--
     <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="IreneWan730_bot" data-size="medium" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
     <script type="text/javascript">
         function onTelegramAuth(user) {
@@ -32,6 +33,8 @@
             console.log('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
         }
     </script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Base64/1.3.0/base64.js"></script>
 </head>
 <body>
 
@@ -42,7 +45,7 @@
 ></canvas>
 <div class="send-box">
     <button class="send-btn" id="saveBtn">SEnD</button>
-    <button class="send-btn" id="loadBtn">Test</button>
+    <button class="send-btn" id="loadBtn">TeQst</button>
     <button class="send-btn" id="ClearBtn">Clearrrrrrrrr</button>
 </div>
 <script type="text/javascript">  
@@ -117,7 +120,12 @@
                 console.log('window.Telegram', window.Telegram)
                 console.log('window.Telegram.WebApp', window.Telegram.WebApp)
                 user = window.Telegram.WebApp.initDataUnsafe.user
-                chat_id = window.Telegram.WebApp.initDataUnsafe.chat_instance
+                var params = window.location.search.replace('?tgWebAppStartParam=')
+                //params = "b'" + params + "'"
+                console.log(params)
+                params = window.atob(params)
+                console.log(params)
+                chat_id = params
                 sendMsg(ws,{
                     tag: 'connected', data: {user: user, chat_id: chat_id}
                 });
@@ -146,6 +154,7 @@
                     };
                     canvas.skipTargetFind = true;
                     canvas.selection = false;
+                    var params = window.location.search.replace('?tgWebAppStartParam')                    
                     canvas.isDrawingMode = true;
                     canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
                     canvas.freeDrawingBrush.width = 5;
