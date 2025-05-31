@@ -53,20 +53,13 @@
 <label id="currentPlayer"></label>
 <script type="text/javascript">  
     var ws
-    var canvas = document.querySelector('#canvas')
-    let screenW = document.documentElement.clientWidth
-    let screenH = document.documentElement.clientHeight
-    let gameWH = 364
-    let kW = screenW / gameWH
-    let kH = screenH / gameWH
-    canvas.setZoom(kW)
+    var canvas = document.querySelector('#canvas')    
     /*
     const saveBtn = document.querySelector('#saveBtn');    
     const loadBtn = document.querySelector('#loadBtn');
     const clearBtn = document.querySelector('#clearBtn');  
     */
-    const cPlayerLabel = document.querySelector('#currentPlayer');
-    cPlayerLabel.innerHTML = 'width = ' + canvas.width
+    const cPlayerLabel = document.querySelector('#currentPlayer');    
     /*
     saveBtn.addEventListener("click", save);
     loadBtn.addEventListener("click", load);
@@ -163,6 +156,13 @@
                 console.log(msg);
                 if (msg.tag == 'start') {
                     canvas = new fabric.Canvas('canvas');
+                    let screenW = document.documentElement.clientWidth
+                    let screenH = document.documentElement.clientHeight
+                    let gameWH = 364
+                    let kW = screenW / gameWH
+                    let kH = screenH / gameWH
+                    canvas.setZoom(kW)
+                    cPlayerLabel.innerHTML = 'width = ' + canvas.width
                     canvas.backgroundColor = 'white'                    
                     canvas.requestRenderAll();
                     if (msg.data) {
