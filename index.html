@@ -61,14 +61,14 @@
     loadBtn.addEventListener("click", load);
     clearBtn.addEventListener("click", clear);
     const color = {
-        '\U0001F534': 'rgb(232, 18, 36)',   # 🔴
-        '\U0001F7E0': 'rgb(247,99,12)',     # 🟠
-        '\U0001F7E1': 'rgb(255,241,0)',     # 🟡
-        '\U0001F7E2': 'rgb(22,198,12)',     # 🟢
-        '\U0001F535': 'rgb(0,120,215)',     # 🔵
-        '\U0001F7E3': 'rgb(136,108,228)',   # 🟣
-        '\U0001F4A9': 'rgb(142,86,46)',     # 💩
-        '\U000026AB': 'rgb(56,56,56)',      # ⚫
+        '\U0001F534': 'rgb(232, 18, 36)',   //🔴
+        '\U0001F7E0': 'rgb(247,99,12)',     //🟠
+        '\U0001F7E1': 'rgb(255,241,0)',     //🟡
+        '\U0001F7E2': 'rgb(22,198,12)',     //🟢
+        '\U0001F535': 'rgb(0,120,215)',     //🔵
+        '\U0001F7E3': 'rgb(136,108,228)',   //🟣
+        '\U0001F4A9': 'rgb(142,86,46)',     //💩
+        '\U000026AB': 'rgb(56,56,56)',      //⚫
     }
 
 
@@ -176,6 +176,7 @@
                     */
                     canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
                     canvas.freeDrawingBrush.width = 5;
+                    canvas.freeDrawingBrush.color = color[msg.user_data.color]
                     canvas.on('mouse:up', e => {
                         if (!canvas.isDrawingMode) {                           return;
                         };
@@ -190,8 +191,7 @@
                     cPlayerLabel.innerHTML = msg.data.name
                     console.log(user, user.id)
                     if (msg.data.id == user.id) {
-                        canvas.isDrawingMode = true;
-                        canvas.freeDrawingBrush.color = color[user.color]
+                        canvas.isDrawingMode = true;                        
                     }
                 }
             };
