@@ -143,7 +143,7 @@
     function connectWebSocket() {
             ws = new WebSocket('wss://howhow5108.camdvr.org:8080');
             ws.onopen = function (event) {
-                console.log('WebSocket connected');
+                
                 console.log('window.location', window.location)
                 console.log('window.Telegram', window.Telegram)
                 console.log('window.Telegram.WebApp', window.Telegram.WebApp)
@@ -157,6 +157,7 @@
                 console.log(params)
                 chat_id = params[0]
                 game_id = params[1]
+                console.log('WebSocket connected, game_id = ', game_id);
                 sendMsg(ws,{
                     tag: 'connected', data: {user: user, chat_id: chat_id}
                 });
@@ -205,8 +206,8 @@
         if (!ws) {
             return;
         }
-        msg.game_id = game_id;
-        console.log('msg======',msg)
+        msg.data.game_id = game_id;
+        console.log(game_id,'msg======',msg)
         ws.send(JSON.stringify(msg));
     }
     connectWebSocket();
