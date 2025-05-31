@@ -52,9 +52,9 @@
 -->
 <label id="currentPlayer"></label>
 <script type="text/javascript">  
-    var ws
-    var canvas = document.querySelector('#canvas')  
+    var ws    
     var canvas = new fabric.Canvas('canvas');
+    const cPlayerLabel = document.querySelector('#currentPlayer');    
     let screenW = document.documentElement.clientWidth
     let screenH = document.documentElement.clientHeight
     let gameWH = 364
@@ -85,7 +85,7 @@
     const loadBtn = document.querySelector('#loadBtn');
     const clearBtn = document.querySelector('#clearBtn');  
     */
-    const cPlayerLabel = document.querySelector('#currentPlayer');    
+    
     /*
     saveBtn.addEventListener("click", save);
     loadBtn.addEventListener("click", load);
