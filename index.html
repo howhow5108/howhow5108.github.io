@@ -81,9 +81,7 @@
         canvas.isDrawingMode = false;
         console.log('checking', chat_id)
         temp = canvas.toDataURL({format: 'jpeg'})
-        setTimeout(function(){
-            sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp})
-        }, 1000);        
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp})      
     })
     /*
     const saveBtn = document.querySelector('#saveBtn');    
@@ -209,9 +207,10 @@
         if (!ws) {
             return;
         }
-        msg.data.game_id = game_id;
-        console.log(game_id,'msg======',msg)
-        ws.send(JSON.stringify(msg));
+        setTimeout(function(){
+            msg.data.game_id = game_id;
+            ws.send(JSON.stringify(msg));
+        }, 500);          
     }
     connectWebSocket();
 </script>
