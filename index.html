@@ -67,7 +67,7 @@
     let ratio = finalWH / gameWH    
     canvas.setDimensions({width:finalWH, height:finalWH});
     canvas.setZoom(ratio)
-    canvas.backgroundColor = 'pink'                    
+    canvas.backgroundColor = 'white'                    
     canvas.requestRenderAll();
     canvas.skipTargetFind = true;
     canvas.selection = false;  
@@ -83,7 +83,7 @@
         temp = canvas.toDataURL({format: 'jpeg'})
         setTimeout(function(){
             sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp})
-        }, 500);        
+        }, 1000);        
     })
     /*
     const saveBtn = document.querySelector('#saveBtn');    
