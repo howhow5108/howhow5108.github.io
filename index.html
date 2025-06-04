@@ -20,6 +20,18 @@
             min-width: 32px;
             height: 66px;
         }
+        .submit-btn {
+            background-color: #04AA6D;
+            border: none;
+            color: white;
+            padding: 15px 48px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+        }
     </style>
     <!-- Load the Telegram Library -->
     <script src="https://telegram.org/js/telegram-web-app.js?57"></script>
@@ -50,11 +62,24 @@
     <button class="send-btn" id="ClearBtn">Clerrrrr</button>    
 </div>
 -->
-<label id="currentPlayer"></label>
+<label id="currentPlayer"></label><br>
+<div id="qMaster" style="display:inline">
+  <label for="qCat">類型:</label>
+  <input type="text" id="qCat" name="qCat" size="10"><br>
+  <label for="qTitle">題目:</label>
+  <input type="text" id="qTitle" name="qTitle" size="10"><br>
+  <button class="submit-btn" id="qSubmit" height="100">Submit</button>  
+</div>
 <script type="text/javascript">  
     var ws    
     var canvas = new fabric.Canvas('canvas');
-    const cPlayerLabel = document.querySelector('#currentPlayer');    
+    const cPlayerLabel = document.querySelector('#currentPlayer');  
+    const qDiv = document.querySelector('#qMaster');
+    qDiv.style.display = "None"
+    const qCat = document.querySelector('#qCat');  
+    const qTitle = document.querySelector('#qTitle');    
+    const qSubmitBtn = document.querySelector('#qSubmit');   
+    qSubmitBtn.addEventListener("click", qSubmit);
     let screenW = document.documentElement.clientWidth
     let screenH = document.documentElement.clientHeight
     let gameWH = 364
@@ -105,6 +130,16 @@
         '⚫': 'rgb(56,56,56)',      //⚫
     }
     console.log(color['⚫'])
+
+
+    function qSubmit() {        
+        if (qCat.value && qTitle.value) {
+            qDiv.style.display = "None"
+            sendMsg(ws,{tag: 'q_master', data: {cat: qCat.value, title: qTitle.value, chat_id: chat_id, game_id: game_id}})
+        } else {
+            alert('請輸入類型和題目!')
+        }        
+    }
 
 
     function save() {
@@ -162,9 +197,6 @@
                 sendMsg(ws,{
                     tag: 'connected', data: {user: user, chat_id: chat_id}
                 });
-                sendMsg(ws,{
-                    tag: 'request', data: {user: user, chat_id: chat_id}
-                });
             };
 
             ws.onerror = function (event) {
@@ -192,13 +224,19 @@
                     if (msg.data.id == user.id) {
                         canvas.isDrawingMode = true;                        
                     }
+                } else if (msg.tag == 'q_master') {
+                    cPlayerLabel.innerHTML = msg.data.name
+                    console.log('q_master', user, user.id)
+                    if (msg.data.id == user.id) {
+                        qDiv.style.display = 'inline'                      
+                    }
                 }
             };
 
             ws.onclose = function (event) {
                 console.log('WebSocket closed',event);
                 // reconnect
-                //setTimeout(connectWebSocket, 1000/2);
+                setTimeout(connectWebSocket, 1000/2);
             };
 
         }
