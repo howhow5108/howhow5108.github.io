@@ -197,6 +197,13 @@
                 sendMsg(ws,{
                     tag: 'connected', data: {user: user, chat_id: chat_id}
                 });
+                if (params.length == 3) {
+                    console.log('q_master_connected', user, user.id, msg.data.id)
+                    if (msg.data.id == user.id) {
+                        qDiv.style.display = 'inline'                      
+                    }
+                }
+                
             };
 
             ws.onerror = function (event) {
@@ -225,7 +232,6 @@
                         canvas.isDrawingMode = true;                        
                     }
                 } else if (msg.tag == 'q_master') {
-                    cPlayerLabel.innerHTML = msg.data.name
                     console.log('q_master', user, user.id)
                     if (msg.data.id == user.id) {
                         qDiv.style.display = 'inline'                      
