@@ -2,9 +2,6 @@
     <title>Document</title>
     <style>
         .q-master-text {
-            position: relative;
-            left: 40%;
-            transform: translate(-50%, -50%);
         }
         .submit-btn {
             background-color: #04AA6D;
@@ -18,14 +15,9 @@
             margin: 4px 2px;
             cursor: pointer;
             border-radius: 8px;
-            width: 20%;
-            position: relative;
-            left: 52%;
-            top: 5%;
-            transform: translate(-50%, -50%);
         }
         input[type=text] {
-            width: 20%;
+            width: 25%;
             padding: 12px 20px;
             margin: 8px 0;
             box-sizing: border-box;           
@@ -71,7 +63,7 @@
     var canvas = new fabric.Canvas('canvas');
     const cPlayerLabel = document.querySelector('#currentPlayer');  
     const qDiv = document.querySelector('#qMaster');
-    qDiv.style.display = "None"
+    //qDiv.style.display = "None"
     const qCat = document.querySelector('#qCat');  
     const qTitle = document.querySelector('#qTitle');    
     const qSubmitBtn = document.querySelector('#qSubmit');   
