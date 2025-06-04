@@ -199,7 +199,7 @@
                 });
                 if (params.length == 4) {
                     console.log('q_master_connected', user, user.id, params[4])
-                    if (msg.data.id == user.id) {
+                    if (params[4] == user.id) {
                         qDiv.style.display = 'inline'                      
                     }
                 }
