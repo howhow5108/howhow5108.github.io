@@ -197,8 +197,8 @@
                 sendMsg(ws,{
                     tag: 'connected', data: {user: user, chat_id: chat_id}
                 });
-                if (params.length == 3) {
-                    console.log('q_master_connected', user, user.id, msg.data.id)
+                if (params.length == 4) {
+                    console.log('q_master_connected', user, user.id, params[4])
                     if (msg.data.id == user.id) {
                         qDiv.style.display = 'inline'                      
                     }
