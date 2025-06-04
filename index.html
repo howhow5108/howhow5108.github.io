@@ -1,24 +1,10 @@
 <head>
     <title>Document</title>
     <style>
-        .send-box {
-            display: flex;
-            align-items: cemter;
-            justify-context: center;
-            gap: 16px;
-            height: 20%;
-        }
-
-        .send-box textarea {
-            width: 80%;
-            resize: none;
-        }
-
-        .send-box .send-btn {
-            flex-shrink: 0;
-            width: 10%;
-            min-width: 32px;
-            height: 66px;
+        .q-master-text {
+            position: relative;
+            left: 40%;
+            transform: translate(-50%, -50%);
         }
         .submit-btn {
             background-color: #04AA6D;
@@ -31,6 +17,18 @@
             font-size: 16px;
             margin: 4px 2px;
             cursor: pointer;
+            border-radius: 8px;
+            width: 20%;
+            position: relative;
+            left: 52%;
+            top: 5%;
+            transform: translate(-50%, -50%);
+        }
+        input[type=text] {
+            width: 20%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;           
         }
     </style>
     <!-- Load the Telegram Library -->
@@ -63,11 +61,9 @@
 </div>
 -->
 <label id="currentPlayer"></label><br>
-<div id="qMaster" style="display:inline">
-  <label for="qCat">類型:</label>
-  <input type="text" id="qCat" name="qCat" size="10"><br>
-  <label for="qTitle">題目:</label>
-  <input type="text" id="qTitle" name="qTitle" size="10"><br>
+<div class="q-master" id="qMaster" style="display:inline">
+  <label class="q-master-text">類型:<input type="text" id="qCat" name="qCat" size="10"></label><br>
+  <label class="q-master-text">題目:<input type="text" id="qTitle" name="qTitle" size="10"></label><br>
   <button class="submit-btn" id="qSubmit" height="100">Submit</button>  
 </div>
 <script type="text/javascript">  
