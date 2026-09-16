@@ -169,6 +169,14 @@
     }
     console.log(color['⚫'])
 
+    function canDrawNow() {
+        return turnStarted && isCurrentPlayerTurn && currentTurnPlayerId === user.id;
+    }
+
+    function canGuessNow() {
+        return !!user && !!turnStarted && !isCurrentPlayerTurn && currentTurnPlayerId !== user.id && currentTurnPlayerId != null;
+    }
+
     function renderWordChoices(options) {
         if (!Array.isArray(options) || !options.length) {
             wordChoices.innerHTML = '';
@@ -224,7 +232,7 @@
         const latestCanvasData = canvas.toDataURL({format: 'jpeg'});
         if (latestCanvasData && latestCanvasData !== lastSentCanvasData) {
             lastSentCanvasData = latestCanvasData;
-            sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: latestCanvasData, final: false})
+            sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: latestCanvasData, final: false, user_id: user.id})
         }
         sendMsg(ws,{tag: 'guess', data: {chat_id: chat_id, game_id: game_id, user_id: user.id, guess: guess, seconds_left: turnSeconds}})
         answerInput.value = ''; 
@@ -241,7 +249,7 @@
     }
 
     function setDrawTool() {
-        if (!isCurrentPlayerTurn) {
+        if (!canDrawNow()) {
             return;
         }
         canvas.isDrawingMode = true;
@@ -250,7 +258,7 @@
     }
 
     function setEraserTool() {
-        if (!isCurrentPlayerTurn) {
+        if (!canDrawNow()) {
             return;
         }
         canvas.isDrawingMode = true;
@@ -259,7 +267,7 @@
     }
 
     function undoCanvas() {
-        if (!isCurrentPlayerTurn) {
+        if (!canDrawNow()) {
             return;
         }
         if (canvasHistory.length <= 1) {
@@ -278,7 +286,7 @@
     }
 
     function clearCanvas() {
-        if (!isCurrentPlayerTurn) {
+        if (!canDrawNow()) {
             return;
         }
         canvas.clear();
@@ -287,7 +295,7 @@
         canvasHistory = [];
         saveCanvasState();
         const temp = canvas.toDataURL({format: 'jpeg'});
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp, final: false})
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp, final: false, user_id: user.id})
     }
 
     function updateTimerDisplay() {
@@ -324,14 +332,15 @@
             return;
         }
         lastSentCanvasData = currentData;
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: currentData, final: false})
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: currentData, final: false, user_id: user.id})
     }
 
     function startTurn() {
-        if (!isCurrentPlayerTurn) {
+        if (!isCurrentPlayerTurn || currentTurnPlayerId !== user.id || !currentQuestion.textContent.includes('題目:')) {
             return;
         }
         turnStarted = true;
+        sendMsg(ws,{tag: 'turn_start', data: {chat_id: chat_id, game_id: game_id, user_id: user.id}})
         turnSeconds = 120;
         lastSentCanvasData = null;
         updateTimerDisplay();
@@ -339,6 +348,7 @@
         canvas.freeDrawingBrush.color = '#000000';
         canvas.freeDrawingBrush.width = 5;
         startTurnBtn.style.display = 'none';
+        canvasTools.style.display = 'flex';
         startTurnCountdown();
     }
 
@@ -350,7 +360,7 @@
         canvas.isDrawingMode = false;
         const finalData = canvas.toDataURL({format: 'jpeg'});
         lastSentCanvasData = finalData;
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: finalData, final: true})
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: finalData, final: true, user_id: user.id})
     }
 
     function qSubmit() {
@@ -361,7 +371,6 @@
             alert('請輸入類型和題目!')
         }
     }
-
 
     function save() {
         temp = canvas.toDataURL({format: 'png'})
@@ -443,7 +452,7 @@
                     currentTurnPlayerId = turnData.id || null;
                     clearInterval(turnTimer);
                     turnTimer = null;
-                    turnStarted = false;
+                    turnStarted = !!turnData.turn_started;
                     turnSeconds = 120;
                     updateTimerDisplay();
                     if (turnData.is_drawer) {
@@ -465,9 +474,11 @@
                             wordChoiceBox.style.display = 'none';
                         }
                         if (turnData.id === user.id) {
-                            canvasTools.style.display = 'none';
+                            canvasTools.style.display = turnStarted ? 'flex' : 'none';
                             canvas.isDrawingMode = false;
-                            if (turnData.selected_word) {
+                            if (turnStarted) {
+                                startTurnBtn.style.display = 'none';
+                            } else if (turnData.selected_word) {
                                 startTurnBtn.style.display = 'block';
                             } else {
                                 startTurnBtn.style.display = 'none';
@@ -483,10 +494,14 @@
                         wordChoiceBox.style.display = 'none';
                         currentQuestion.style.display = 'none';
                         currentQuestion.textContent = '題目: ';
-                        answerBox.style.display = 'block';
-                        answerInput.value = '';
-                        turnStarted = true;
-                        startTurnCountdown();
+                        if (turnStarted) {
+                            answerBox.style.display = 'block';
+                            answerInput.value = '';
+                            startTurnCountdown();
+                        } else {
+                            answerBox.style.display = 'none';
+                            answerInput.value = '';
+                        }
                     }
                 } else if (msg.tag == 'turn_ready') {
                     if (msg.data && msg.data.selected_word) {
