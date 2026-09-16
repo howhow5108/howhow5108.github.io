@@ -1,0 +1,505 @@
+<head>
+    <title>Document</title>
+    <style>
+        .submit-btn {
+            background-color: #04AA6D;
+            border: none;
+            color: white;
+            padding: 15px 48px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 8px;
+        }
+        .canvas-tools {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+            margin-bottom: 8px;
+        }
+        .tool-btn {
+            background: #f1f1f1;
+            border: 1px solid #d9d9d9;
+            color: #333;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        input[type=text] {
+            width: 25%;
+            padding: 12px 20px;
+            margin: 8px 0;
+            box-sizing: border-box;           
+        }
+    </style>
+    <!-- Load the Telegram Library -->
+    <script src="https://telegram.org/js/telegram-web-app.js?57"></script>
+    <!-- Load the Fabric Library -->
+    <script src="https://cdn.jsdelivr.net/npm/fabric@latest/dist/index.min.js"></script>
+    <!--
+    <script async src="https://telegram.org/js/telegram-widget.js?22" data-telegram-login="IreneWan730_bot" data-size="medium" data-onauth="onTelegramAuth(user)" data-request-access="write"></script>
+    <script type="text/javascript">
+        function onTelegramAuth(user) {
+            alert('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
+            console.log('Logged in as ' + user.first_name + ' ' + user.last_name + ' (' + user.id + (user.username ? ', @' + user.username : '') + ')');
+        }
+    </script>
+    -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Base64/1.3.0/base64.js"></script>
+</head>
+<body>
+
+<div style="text-align:center; margin-bottom:8px;">
+  <div id="currentQuestion" style="font-size:16px; font-weight:700; min-height:24px; display:none;">題目: </div>
+  <label id="turnTimer" style="font-size:18px; font-weight:600;">時間: 120</label>
+</div>
+<div style="position:relative; width:fit-content; margin:0 auto;">
+  <canvas id="canvas"
+    width="364" 
+    height="364" 
+    style="border: 1px solid #ccc; display:block;"
+  ></canvas>
+  <button id="startTurnBtn" type="button" style="position:absolute; left:50%; top:50%; transform:translate(-50%, -50%); z-index:10; display:none; background:#04AA6D; color:white; border:none; border-radius:12px; padding:18px 36px; font-size:20px; font-weight:700; cursor:pointer; box-shadow:0 3px 8px rgba(0,0,0,0.2);">開始</button>
+</div>
+<div id="wordChoiceBox" style="display:none; margin-top:12px; text-align:center;">
+  <div style="font-size:16px; font-weight:700; margin-bottom:8px;">請選擇題目：</div>
+  <div id="wordChoices" style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;"></div>
+</div>
+<div id="answerBox" style="display:none; margin-top:12px; text-align:center;">
+  <input id="answerInput" type="text" placeholder="輸入答案" style="width:70%; max-width:260px; padding:10px 12px; border:1px solid #ccc; border-radius:8px; margin-right:8px;" />
+  <button id="answerSubmitBtn" type="button" style="background:#04AA6D; color:white; border:none; border-radius:8px; padding:10px 18px; font-weight:700; cursor:pointer;">送出答案</button>
+</div>
+<div id="canvasTools" class="canvas-tools" style="display:none; margin-top:12px; justify-content:center; gap:8px;">
+  <button id="drawToolBtn" type="button" class="tool-btn">畫筆</button>
+  <button id="eraserToolBtn" type="button" class="tool-btn">擦膠</button>
+  <button id="undoCanvasBtn" type="button" class="tool-btn">上一步</button>
+  <button id="clearCanvasBtn" type="button" class="tool-btn">清空</button>
+</div>
+<!--
+<div class="send-box">
+    <button class="send-btn" id="saveBtn">SnD</button>
+    <button class="send-btn" id="loadBtn">Text</button>
+    <button class="send-btn" id="ClearBtn">Clerrrrr</button>    
+</div>
+-->
+<label id="currentPlayer"></label><br>
+<div class="q-master" id="qMaster" style="display:inline">
+  <label class="q-master-text">類型:<input type="text" id="qCat" name="qCat" size="10"></label><br>
+  <label class="q-master-text">題目:<input type="text" id="qTitle" name="qTitle" size="10"></label><br>
+  <button class="submit-btn" id="qSubmit" height="100">Submit</button>  
+</div>
+<script type="text/javascript">  
+    var ws    
+    var canvas = new fabric.Canvas('canvas');
+    const cPlayerLabel = document.querySelector('#currentPlayer');  
+    const qDiv = document.querySelector('#qMaster');
+    const timerLabel = document.querySelector('#turnTimer');
+    const startTurnBtn = document.querySelector('#startTurnBtn');
+    const canvasTools = document.querySelector('#canvasTools');
+    const drawToolBtn = document.querySelector('#drawToolBtn');
+    const eraserToolBtn = document.querySelector('#eraserToolBtn');
+    const undoCanvasBtn = document.querySelector('#undoCanvasBtn');
+    const clearCanvasBtn = document.querySelector('#clearCanvasBtn');
+    const currentQuestion = document.querySelector('#currentQuestion');
+    const wordChoiceBox = document.querySelector('#wordChoiceBox');
+    const wordChoices = document.querySelector('#wordChoices');
+    const answerBox = document.querySelector('#answerBox');
+    const answerInput = document.querySelector('#answerInput');
+    const answerSubmitBtn = document.querySelector('#answerSubmitBtn');
+    let turnSeconds = 120;
+    let turnTimer = null;
+    let isCurrentPlayerTurn = false;
+    let canvasHistory = [];
+    let lastSentCanvasData = null;
+    let currentTurnPlayerId = null;
+    let turnStarted = false;
+    qDiv.style.display = "None"
+    const qCat = document.querySelector('#qCat');  
+    const qTitle = document.querySelector('#qTitle');    
+    const qSubmitBtn = document.querySelector('#qSubmit');   
+    qSubmitBtn.addEventListener("click", qSubmit);
+    startTurnBtn.addEventListener('click', startTurn);
+    drawToolBtn.addEventListener('click', setDrawTool);
+    eraserToolBtn.addEventListener('click', setEraserTool);
+    undoCanvasBtn.addEventListener('click', undoCanvas);
+    clearCanvasBtn.addEventListener('click', clearCanvas);
+    answerSubmitBtn.addEventListener('click', submitGuess);
+    let screenW = document.documentElement.clientWidth
+    let screenH = document.documentElement.clientHeight
+    let gameWH = 364
+    let finalWH = Math.min(screenW, screenH)
+    if (finalWH == screenH) {
+        finalWH -= 100
+    } else {
+        finalWH -= 20
+    };
+    let ratio = finalWH / gameWH    
+    canvas.setDimensions({width:finalWH, height:finalWH});
+    canvas.setZoom(ratio)
+    canvas.backgroundColor = 'white'             
+    canvas.requestRenderAll();
+    console.log('fuck', JSON.stringify(canvas))
+    canvas.skipTargetFind = true;
+    canvas.selection = false;  
+    canvas.freeDrawingBrush = new fabric.PencilBrush(canvas);
+    canvas.freeDrawingBrush.width = 5;
+    canvas.freeDrawingBrush.color = '#000000';
+    saveCanvasState();
+    canvas.on('mouse:up', e => {
+        if (!canvas.isDrawingMode || !isCurrentPlayerTurn) {
+            return;
+        };
+        saveCanvasState();
+    })
+    const color = {
+        '🔴': 'rgb(232, 18, 36)',   //🔴
+        '🟠': 'rgb(247,99,12)',     //🟠
+        '🟡': 'rgb(255,241,0)',     //🟡
+        '🟢': 'rgb(22,198,12)',     //🟢
+        '🔵': 'rgb(0,120,215)',     //🔵
+        '🟣': 'rgb(136,108,228)',   //🟣
+        '💩': 'rgb(142,86,46)',     //💩
+        '⚫': 'rgb(56,56,56)',      //⚫
+    }
+    console.log(color['⚫'])
+
+    function renderWordChoices(options) {
+        if (!Array.isArray(options) || !options.length) {
+            wordChoices.innerHTML = '';
+            wordChoiceBox.style.display = 'none';
+            return;
+        }
+        wordChoices.innerHTML = '';
+        options.forEach((item) => {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.textContent = item[1];
+            button.style.cssText = 'padding:10px 14px; border:1px solid #d9d9d9; border-radius:8px; background:#f7f7f7; font-weight:700; cursor:pointer;';
+            button.addEventListener('click', () => selectWordOption(item[1]));
+            wordChoices.appendChild(button);
+        });
+        wordChoiceBox.style.display = 'block';
+    }
+
+    function hideTurnUi() {
+        wordChoiceBox.style.display = 'none';
+        answerBox.style.display = 'none';
+        currentQuestion.style.display = 'none';
+        currentQuestion.textContent = '題目: ';
+        canvasTools.style.display = 'none';
+        startTurnBtn.style.display = 'none';
+    }
+
+    function selectWordOption(word) {
+        if (!isCurrentPlayerTurn || currentTurnPlayerId !== user.id) {
+            return;
+        }
+        currentQuestion.textContent = `題目: ${word}`;
+        currentQuestion.style.display = 'block';
+        wordChoiceBox.style.display = 'none';
+        sendMsg(ws,{tag: 'word_choice', data: {chat_id: chat_id, game_id: game_id, user_id: user.id, word: word}})
+        canvas.clear();
+        canvas.backgroundColor = 'white';
+        canvas.requestRenderAll();
+        canvasTools.style.display = 'flex';
+        startTurnBtn.style.display = 'block';
+        answerBox.style.display = 'none';
+    }
+
+    function submitGuess() {
+        if (!ws || !user || currentTurnPlayerId === user.id) {
+            return;
+        }
+        const guess = answerInput.value.trim();
+        if (!guess) {
+            alert('請輸入答案');
+            return;
+        }
+        sendMsg(ws,{tag: 'guess', data: {chat_id: chat_id, game_id: game_id, user_id: user.id, guess: guess, seconds_left: turnSeconds}})
+        answerInput.value = ''; 
+    }
+
+    function saveCanvasState() {
+        const snapshot = JSON.stringify(canvas.toJSON());
+        if (canvasHistory.length === 0 || canvasHistory[canvasHistory.length - 1] !== snapshot) {
+            canvasHistory.push(snapshot);
+        }
+        if (canvasHistory.length > 30) {
+            canvasHistory.shift();
+        }
+    }
+
+    function setDrawTool() {
+        if (!isCurrentPlayerTurn) {
+            return;
+        }
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush.color = '#000000';
+        canvas.freeDrawingBrush.width = 5;
+    }
+
+    function setEraserTool() {
+        if (!isCurrentPlayerTurn) {
+            return;
+        }
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush.color = '#ffffff';
+        canvas.freeDrawingBrush.width = 18;
+    }
+
+    function undoCanvas() {
+        if (!isCurrentPlayerTurn) {
+            return;
+        }
+        if (canvasHistory.length <= 1) {
+            canvas.clear();
+            canvas.backgroundColor = 'white';
+            canvas.requestRenderAll();
+            saveCanvasState();
+            return;
+        }
+        canvasHistory.pop();
+        const previousState = canvasHistory[canvasHistory.length - 1];
+        canvas.loadFromJSON(previousState, () => {
+            canvas.backgroundColor = 'white';
+            canvas.requestRenderAll();
+        });
+    }
+
+    function clearCanvas() {
+        if (!isCurrentPlayerTurn) {
+            return;
+        }
+        canvas.clear();
+        canvas.backgroundColor = 'white';
+        canvas.requestRenderAll();
+        canvasHistory = [];
+        saveCanvasState();
+        const temp = canvas.toDataURL({format: 'jpeg'});
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp, final: false})
+    }
+
+    function updateTimerDisplay() {
+        timerLabel.textContent = `時間: ${turnSeconds}`;
+    }
+
+    function sendCanvasSnapshot() {
+        if (!ws || !canvas || !isCurrentPlayerTurn || !turnStarted) {
+            return;
+        }
+        const currentData = canvas.toDataURL({format: 'jpeg'});
+        if (lastSentCanvasData && lastSentCanvasData === currentData) {
+            return;
+        }
+        lastSentCanvasData = currentData;
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: currentData, final: false})
+    }
+
+    function startTurn() {
+        if (!isCurrentPlayerTurn) {
+            return;
+        }
+        turnStarted = true;
+        turnSeconds = 120;
+        lastSentCanvasData = null;
+        updateTimerDisplay();
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush.color = '#000000';
+        canvas.freeDrawingBrush.width = 5;
+        startTurnBtn.style.display = 'none';
+        clearInterval(turnTimer);
+        turnTimer = setInterval(function() {
+            if (turnSeconds <= 1) {
+                clearInterval(turnTimer);
+                turnTimer = null;
+                finishTurn();
+                return;
+            }
+            turnSeconds -= 1;
+            updateTimerDisplay();
+            sendCanvasSnapshot();
+        }, 1000);
+    }
+
+    function finishTurn() {
+        if (!turnStarted) {
+            return;
+        }
+        turnStarted = false;
+        canvas.isDrawingMode = false;
+        const finalData = canvas.toDataURL({format: 'jpeg'});
+        lastSentCanvasData = finalData;
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: finalData, final: true})
+    }
+
+    function qSubmit() {
+        if (qCat.value && qTitle.value) {
+            qDiv.style.display = "None"
+            sendMsg(ws,{tag: 'q_master', data: {cat: qCat.value, title: qTitle.value, chat_id: chat_id, game_id: game_id}})
+        } else {
+            alert('請輸入類型和題目!')
+        }
+    }
+
+
+    function save() {
+        temp = canvas.toDataURL({format: 'png'})
+        console.log(temp)        
+        window.Telegram.WebApp.sendData(JSON.stringify(
+            {
+                tag: 'send_pic',
+                data: temp
+            }
+            ));        
+    }
+
+    function load() {
+        temp = canvas.toDataURL({format: 'jpeg'})
+        console.log(window.location.search)
+        sendMsg(ws,{tag: 'send_img', data: {user: user, img: temp}})
+    }
+
+    function clear() {
+        console.log('clear')
+        console.log(window.location.search)
+        canvas.clear();
+        sendMsg(ws,{tag: 'clear', data: JSON.stringify(canvas)})
+    }
+
+    function connectWebSocket() {
+            ws = new WebSocket('wss://howhow5108.camdvr.org:8080');
+            ws.onopen = function (event) {
+                console.log('window.location', window.location)
+                console.log('window.Telegram', window.Telegram)
+                console.log('window.Telegram.WebApp', window.Telegram.WebApp)
+                console.log('window.Telegram.WebApp', window.Telegram.WebApp.backgroundColor)
+                window.Telegram.WebApp.setBackgroundColor("#ffffff")
+                user = window.Telegram.WebApp.initDataUnsafe.user
+                var params = window.location.search.replace('?tgWebAppStartParam=', '')
+                console.log(params)
+                params = decodeURIComponent(params)
+                console.log(params)
+                params = window.atob(params)
+                console.log(params)
+                params = JSON.parse(params)
+                chat_id = params[0]
+                game_id = params[1]
+                console.log('WebSocket connected, game_id = ', game_id);
+                sendMsg(ws,{
+                    tag: 'connected', data: {user: user, chat_id: chat_id}
+                });
+                if (params.length == 4) {
+                    console.log('q_master_connected', user, user.id, params[3])
+                    if (params[3] == user.id) {
+                        qDiv.style.display = 'inline'                      
+                    }
+                }
+                
+            };
+
+            ws.onerror = function (event) {
+                console.log(event)
+                ws.onclose=function(e){
+                    console.log(e)
+                };
+            };
+
+            ws.onmessage = function (event) {  
+                const msg = JSON.parse(event.data);  
+                console.log(msg);
+                if (msg.tag == 'start') {                    
+                    if (msg.data) {
+                        canvas.loadFromJSON(msg.data);
+                        canvas.requestRenderAll();
+                    };                    
+                    canvas.freeDrawingBrush.color = color[msg.user_data.color];                    
+                } else if (msg.tag == 'canvas') {
+                    canvas.loadFromJSON(msg.data);
+                    canvas.requestRenderAll();
+                } else if (msg.tag == 'current_player') {
+                    const turnData = msg.data || {};
+                    cPlayerLabel.innerHTML = turnData.name || '';
+                    currentTurnPlayerId = turnData.id || null;
+                    if (turnData.is_drawer) {
+                        isCurrentPlayerTurn = (turnData.id === user.id);
+                        answerBox.style.display = 'none';
+                        if (turnData.mode === 1) {
+                            if (turnData.selected_word) {
+                                currentQuestion.textContent = `題目: ${turnData.selected_word}`;
+                                currentQuestion.style.display = 'block';
+                                wordChoiceBox.style.display = 'none';
+                            } else {
+                                currentQuestion.style.display = 'none';
+                                currentQuestion.textContent = '題目: ';
+                                renderWordChoices(turnData.word_options || []);
+                            }
+                        } else {
+                            currentQuestion.textContent = '題目: ';
+                            currentQuestion.style.display = 'none';
+                            wordChoiceBox.style.display = 'none';
+                        }
+                        if (turnData.id === user.id) {
+                            canvasTools.style.display = 'flex';
+                            canvas.isDrawingMode = false;
+                            if (turnData.selected_word) {
+                                startTurnBtn.style.display = 'block';
+                            } else {
+                                startTurnBtn.style.display = 'none';
+                            }
+                        } else {
+                            canvasTools.style.display = 'none';
+                            startTurnBtn.style.display = 'none';
+                        }
+                    } else {
+                        isCurrentPlayerTurn = false;
+                        canvasTools.style.display = 'none';
+                        startTurnBtn.style.display = 'none';
+                        wordChoiceBox.style.display = 'none';
+                        currentQuestion.style.display = 'none';
+                        currentQuestion.textContent = '題目: ';
+                        answerBox.style.display = 'block';
+                        answerInput.value = '';
+                    }
+                    clearInterval(turnTimer);
+                    turnTimer = null;
+                    turnSeconds = 120;
+                    updateTimerDisplay();
+                } else if (msg.tag == 'turn_ready') {
+                    if (msg.data && msg.data.selected_word) {
+                        currentQuestion.textContent = `題目: ${msg.data.selected_word}`;
+                        currentQuestion.style.display = 'block';
+                        wordChoiceBox.style.display = 'none';
+                    }
+                } else if (msg.tag == 'q_master') {
+                    console.log('q_master', user, user.id)
+                    if (msg.data.id == user.id) {
+                        qDiv.style.display = 'inline'                      
+                    }
+                }
+            };
+
+            ws.onclose = function (event) {
+                console.log('WebSocket closed',event);
+                setTimeout(connectWebSocket, 1000/2);
+            };
+
+        }
+
+    function sendMsg(ws, msg) {
+        if (!ws) {
+            return;
+        }
+        setTimeout(function(){
+            msg.data.game_id = game_id;
+            ws.send(JSON.stringify(msg));
+        }, 500);          
+    }
+    connectWebSocket();
+</script>
+</body>
