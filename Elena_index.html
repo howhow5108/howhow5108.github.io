@@ -1,5 +1,5 @@
 <head>
-    <title>Elena</title>
+    <title>Document</title>
     <style>
         .submit-btn {
             background-color: #04AA6D;
@@ -207,19 +207,24 @@
         canvas.clear();
         canvas.backgroundColor = 'white';
         canvas.requestRenderAll();
-        canvasTools.style.display = 'flex';
-        startTurnBtn.style.display = 'block';
+        canvasTools.style.display = 'none';
+        startTurnBtn.style.display = 'none';
         answerBox.style.display = 'none';
     }
 
     function submitGuess() {
-        if (!ws || !user || currentTurnPlayerId === user.id) {
+        if (!ws || !user || currentTurnPlayerId === user.id || !turnStarted || isCurrentPlayerTurn) {
             return;
         }
         const guess = answerInput.value.trim();
         if (!guess) {
             alert('請輸入答案');
             return;
+        }
+        const latestCanvasData = canvas.toDataURL({format: 'jpeg'});
+        if (latestCanvasData && latestCanvasData !== lastSentCanvasData) {
+            lastSentCanvasData = latestCanvasData;
+            sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: latestCanvasData, final: false})
         }
         sendMsg(ws,{tag: 'guess', data: {chat_id: chat_id, game_id: game_id, user_id: user.id, guess: guess, seconds_left: turnSeconds}})
         answerInput.value = ''; 
@@ -289,6 +294,27 @@
         timerLabel.textContent = `時間: ${turnSeconds}`;
     }
 
+    function startTurnCountdown() {
+        clearInterval(turnTimer);
+        turnTimer = setInterval(function() {
+            if (turnSeconds <= 1) {
+                clearInterval(turnTimer);
+                turnTimer = null;
+                turnStarted = false;
+                updateTimerDisplay();
+                if (isCurrentPlayerTurn && currentTurnPlayerId === user.id) {
+                    finishTurn();
+                }
+                return;
+            }
+            turnSeconds -= 1;
+            updateTimerDisplay();
+            if (isCurrentPlayerTurn && currentTurnPlayerId === user.id) {
+                sendCanvasSnapshot();
+            }
+        }, 1000);
+    }
+
     function sendCanvasSnapshot() {
         if (!ws || !canvas || !isCurrentPlayerTurn || !turnStarted) {
             return;
@@ -313,18 +339,7 @@
         canvas.freeDrawingBrush.color = '#000000';
         canvas.freeDrawingBrush.width = 5;
         startTurnBtn.style.display = 'none';
-        clearInterval(turnTimer);
-        turnTimer = setInterval(function() {
-            if (turnSeconds <= 1) {
-                clearInterval(turnTimer);
-                turnTimer = null;
-                finishTurn();
-                return;
-            }
-            turnSeconds -= 1;
-            updateTimerDisplay();
-            sendCanvasSnapshot();
-        }, 1000);
+        startTurnCountdown();
     }
 
     function finishTurn() {
@@ -426,6 +441,11 @@
                     const turnData = msg.data || {};
                     cPlayerLabel.innerHTML = turnData.name || '';
                     currentTurnPlayerId = turnData.id || null;
+                    clearInterval(turnTimer);
+                    turnTimer = null;
+                    turnStarted = false;
+                    turnSeconds = 120;
+                    updateTimerDisplay();
                     if (turnData.is_drawer) {
                         isCurrentPlayerTurn = (turnData.id === user.id);
                         answerBox.style.display = 'none';
@@ -445,7 +465,7 @@
                             wordChoiceBox.style.display = 'none';
                         }
                         if (turnData.id === user.id) {
-                            canvasTools.style.display = 'flex';
+                            canvasTools.style.display = 'none';
                             canvas.isDrawingMode = false;
                             if (turnData.selected_word) {
                                 startTurnBtn.style.display = 'block';
@@ -465,11 +485,9 @@
                         currentQuestion.textContent = '題目: ';
                         answerBox.style.display = 'block';
                         answerInput.value = '';
+                        turnStarted = true;
+                        startTurnCountdown();
                     }
-                    clearInterval(turnTimer);
-                    turnTimer = null;
-                    turnSeconds = 120;
-                    updateTimerDisplay();
                 } else if (msg.tag == 'turn_ready') {
                     if (msg.data && msg.data.selected_word) {
                         currentQuestion.textContent = `題目: ${msg.data.selected_word}`;
