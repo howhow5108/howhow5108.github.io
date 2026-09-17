@@ -453,7 +453,7 @@
                     clearInterval(turnTimer);
                     turnTimer = null;
                     turnStarted = !!turnData.turn_started;
-                    turnSeconds = 120;
+                    turnSeconds = turnData.time_left || 120;
                     updateTimerDisplay();
                     if (turnData.is_drawer) {
                         isCurrentPlayerTurn = (turnData.id === user.id);
