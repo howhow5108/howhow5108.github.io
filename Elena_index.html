@@ -338,6 +338,7 @@
         }
         turnStarted = true;
         sendMsg(ws,{tag: 'turn_start', data: {chat_id: chat_id, game_id: game_id, user_id: user.id}})
+        console.log('turnLimitSeconds', turnLimitSeconds)
         turnSeconds = turnLimitSeconds;
         lastSentCanvasData = null;
         updateTimerDisplay();
