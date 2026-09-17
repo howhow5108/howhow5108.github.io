@@ -453,6 +453,7 @@
                     clearInterval(turnTimer);
                     turnTimer = null;
                     turnStarted = !!turnData.turn_started;
+                    console.log('aaaaaaaaaaaaaaaaaaaa', turnData.time_left)
                     turnSeconds = turnData.time_left || 10;
                     console.log('pppp')
                     updateTimerDisplay();
