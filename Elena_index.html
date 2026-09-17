@@ -230,10 +230,6 @@
             return;
         }
         const latestCanvasData = canvas.toDataURL({format: 'jpeg'});
-        if (latestCanvasData && latestCanvasData !== lastSentCanvasData) {
-            lastSentCanvasData = latestCanvasData;
-            sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: latestCanvasData, final: false, user_id: user.id})
-        }
         sendMsg(ws,{tag: 'guess', data: {chat_id: chat_id, game_id: game_id, user_id: user.id, guess: guess, seconds_left: turnSeconds}})
         answerInput.value = ''; 
     }
@@ -339,15 +335,12 @@
         if (!isCurrentPlayerTurn || currentTurnPlayerId !== user.id || !currentQuestion.textContent.includes('題目:')) {
             return;
         }
-        console.log('startTurn', user.id, currentTurnPlayerId, currentQuestion.textContent)
         turnStarted = true;
         sendMsg(ws,{tag: 'turn_start', data: {chat_id: chat_id, game_id: game_id, user_id: user.id}})
         turnSeconds = 120;
         lastSentCanvasData = null;
         updateTimerDisplay();
-        canvas.isDrawingMode = true;
-        canvas.freeDrawingBrush.color = '#000000';
-        canvas.freeDrawingBrush.width = 5;
+        applyDefaultDrawingState();
         startTurnBtn.style.display = 'none';
         canvasTools.style.display = 'flex';
         startTurnCountdown();
@@ -395,6 +388,13 @@
         console.log(window.location.search)
         canvas.clear();
         sendMsg(ws,{tag: 'clear', data: JSON.stringify(canvas)})
+    }
+
+    function applyDefaultDrawingState() {
+        canvas.isDrawingMode = true;
+        canvas.freeDrawingBrush = canvas.freeDrawingBrush || new fabric.PencilBrush(canvas);
+        canvas.freeDrawingBrush.color = '#000000';
+        canvas.freeDrawingBrush.width = 5;
     }
 
     function connectWebSocket() {
@@ -476,9 +476,10 @@
                         }
                         if (turnData.id === user.id) {
                             canvasTools.style.display = turnStarted ? 'flex' : 'none';
-                            canvas.isDrawingMode = false;
                             if (turnStarted) {
+                                applyDefaultDrawingState();
                                 startTurnBtn.style.display = 'none';
+                                startTurnCountdown();
                             } else if (turnData.selected_word) {
                                 startTurnBtn.style.display = 'block';
                             } else {
