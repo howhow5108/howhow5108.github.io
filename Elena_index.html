@@ -302,21 +302,18 @@
     function startTurnCountdown() {
         clearInterval(turnTimer);
         turnTimer = setInterval(function() {
-            if (turnSeconds <= 1) {
+            if (isCurrentPlayerTurn && currentTurnPlayerId === user.id) {
+                sendCanvasSnapshot();
+            }
+            if (turnSeconds == 0) {
                 clearInterval(turnTimer);
                 turnTimer = null;
                 turnSeconds = 0;
                 updateTimerDisplay();
-                if (isCurrentPlayerTurn && currentTurnPlayerId === user.id) {
-                    finishTurn();
-                }
                 return;
             }
             turnSeconds -= 1;
-            updateTimerDisplay();
-            if (isCurrentPlayerTurn && currentTurnPlayerId === user.id) {
-                sendCanvasSnapshot();
-            }
+            updateTimerDisplay();            
         }, 1000);
     }
 
@@ -354,9 +351,6 @@
         }
         turnStarted = false;
         canvas.isDrawingMode = false;
-        const finalData = canvas.toDataURL({format: 'jpeg'});
-        lastSentCanvasData = finalData;
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: finalData, final: true, user_id: user.id})
     }
 
     function qSubmit() {
@@ -520,6 +514,11 @@
                     console.log('q_master', user, user.id)
                     if (msg.data.id == user.id) {
                         qDiv.style.display = 'inline'                      
+                    }
+                } else if (msg.tag == 'finish') {
+                    if (msg.data && msg.data.reason === 'timeout') {
+                        alert('時間到，回合結束！');
+                        finishTurn();
                     }
                 }
             };
