@@ -304,7 +304,6 @@
             if (turnSeconds <= 1) {
                 clearInterval(turnTimer);
                 turnTimer = null;
-                turnStarted = false;
                 updateTimerDisplay();
                 if (isCurrentPlayerTurn && currentTurnPlayerId === user.id) {
                     finishTurn();
@@ -327,7 +326,6 @@
         if (lastSentCanvasData && lastSentCanvasData === currentData) {
             return;
         }
-        console.log('1234')
         lastSentCanvasData = currentData;
         sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: currentData, final: false, user_id: user.id})
     }
