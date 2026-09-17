@@ -292,7 +292,7 @@
         canvasHistory = [];
         saveCanvasState();
         const temp = canvas.toDataURL({format: 'jpeg'});
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp, final: false, user_id: user.id})
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp, final: false, user_id: user.id, seconds_left: turnSeconds})
     }
 
     function updateTimerDisplay() {
@@ -303,9 +303,7 @@
         clearInterval(turnTimer);
         turnTimer = setInterval(function() {
             if (isCurrentPlayerTurn && currentTurnPlayerId === user.id) {
-                if (turnSeconds % 5 === 0) {
-                    sendCanvasSnapshot();
-                }
+                sendCanvasSnapshot();
             }
             if (turnSeconds == 0) {
                 clearInterval(turnTimer);
@@ -328,7 +326,7 @@
             return;
         }
         lastSentCanvasData = currentData;
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: currentData, final: false, user_id: user.id})
+        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: currentData, final: false, user_id: user.id, seconds_left: turnSeconds})
     }
 
     function startTurn() {
