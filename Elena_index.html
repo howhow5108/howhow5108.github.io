@@ -453,7 +453,8 @@
                     clearInterval(turnTimer);
                     turnTimer = null;
                     turnStarted = !!turnData.turn_started;
-                    turnSeconds = turnData.time_left || 120;
+                    turnSeconds = turnData.time_left || 10;
+                    console.log('pppp')
                     updateTimerDisplay();
                     if (turnData.is_drawer) {
                         isCurrentPlayerTurn = (turnData.id === user.id);
