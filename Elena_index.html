@@ -289,10 +289,7 @@
         canvas.clear();
         canvas.backgroundColor = 'white';
         canvas.requestRenderAll();
-        canvasHistory = [];
-        saveCanvasState();
-        const temp = canvas.toDataURL({format: 'jpeg'});
-        sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: temp, final: false, user_id: user.id, seconds_left: turnSeconds})
+        saveCanvasState();      
     }
 
     function updateTimerDisplay() {
