@@ -113,6 +113,7 @@
     const answerInput = document.querySelector('#answerInput');
     const answerSubmitBtn = document.querySelector('#answerSubmitBtn');
     let turnSeconds = 120;
+    let turnLimitSeconds = 120;
     let turnTimer = null;
     let isCurrentPlayerTurn = false;
     let canvasHistory = [];
@@ -304,6 +305,7 @@
             if (turnSeconds <= 1) {
                 clearInterval(turnTimer);
                 turnTimer = null;
+                turnSeconds = 0;
                 updateTimerDisplay();
                 if (isCurrentPlayerTurn && currentTurnPlayerId === user.id) {
                     finishTurn();
@@ -336,7 +338,7 @@
         }
         turnStarted = true;
         sendMsg(ws,{tag: 'turn_start', data: {chat_id: chat_id, game_id: game_id, user_id: user.id}})
-        turnSeconds = 120;
+        turnSeconds = turnLimitSeconds;
         lastSentCanvasData = null;
         updateTimerDisplay();
         applyDefaultDrawingState();
@@ -453,7 +455,10 @@
                     clearInterval(turnTimer);
                     turnTimer = null;
                     turnStarted = !!turnData.turn_started;
-                    turnSeconds = turnData.time_left || 120;
+                    const configuredLimit = Number(turnData.time_limit);
+                    const remainingTime = Number(turnData.time_left);
+                    turnLimitSeconds = Number.isFinite(configuredLimit) && configuredLimit > 0 ? configuredLimit : 120;
+                    turnSeconds = Number.isFinite(remainingTime) && remainingTime >= 0 ? remainingTime : turnLimitSeconds;
                     updateTimerDisplay();
                     if (turnData.is_drawer) {
                         isCurrentPlayerTurn = (turnData.id === user.id);
