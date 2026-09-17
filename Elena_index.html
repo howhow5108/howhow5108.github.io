@@ -303,7 +303,9 @@
         clearInterval(turnTimer);
         turnTimer = setInterval(function() {
             if (isCurrentPlayerTurn && currentTurnPlayerId === user.id) {
-                sendCanvasSnapshot();
+                if (turnSeconds % 5 === 0) {
+                    sendCanvasSnapshot();
+                }
             }
             if (turnSeconds == 0) {
                 clearInterval(turnTimer);
