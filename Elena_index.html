@@ -339,6 +339,7 @@
         if (!isCurrentPlayerTurn || currentTurnPlayerId !== user.id || !currentQuestion.textContent.includes('題目:')) {
             return;
         }
+        console.log('startTurn', user.id, currentTurnPlayerId, currentQuestion.textContent)
         turnStarted = true;
         sendMsg(ws,{tag: 'turn_start', data: {chat_id: chat_id, game_id: game_id, user_id: user.id}})
         turnSeconds = 120;
