@@ -319,10 +319,6 @@
             return;
         }
         const currentData = canvas.toDataURL({format: 'jpeg'});
-        if (lastSentCanvasData && lastSentCanvasData === currentData) {
-            return;
-        }
-        lastSentCanvasData = currentData;
         sendMsg(ws,{tag: 'drawn', data: JSON.stringify(canvas), chat_id: chat_id, img: currentData, final: false, user_id: user.id, seconds_left: turnSeconds})
     }
 
